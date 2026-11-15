@@ -8,13 +8,27 @@ if ! command -v npm >/dev/null 2>&1; then
   read -r -p "按回车关闭窗口。" _answer
   exit 1
 fi
-if [ ! -f node_modules/electron/dist/Electron.app/Contents/MacOS/Electron ]; then
+if [ ! -f node_modules/electron/install.js ]; then
   echo "首次启动需要下载依赖，请保持联网并等待。"
   if ! npm ci --no-audit --no-fund; then
     echo "安装没有完成，请把上面的错误信息发给我。"
     read -r -p "按回车关闭窗口。" _answer
     exit 1
   fi
+fi
+# npm may skip dependency lifecycle scripts; run Electron's own verified installer explicitly.
+if ! node -e 'const fs = require("node:fs"); if (!fs.existsSync(require("electron"))) process.exit(1)' >/dev/null 2>&1; then
+  echo "正在补装 Electron 启动组件，请保持联网并等待……"
+  if ! ELECTRON_SKIP_BINARY_DOWNLOAD= node node_modules/electron/install.js; then
+    echo "启动组件下载失败。请把上面的错误信息发给我，不要关闭安全验证。"
+    read -r -p "按回车关闭窗口。" _answer
+    exit 1
+  fi
+fi
+if ! node -e 'const fs = require("node:fs"); if (!fs.existsSync(require("electron"))) process.exit(1)'; then
+  echo "启动组件仍不完整，请把上面的错误信息发给我。"
+  read -r -p "按回车关闭窗口。" _answer
+  exit 1
 fi
 echo "小狗正在启动。退出时请点击小狗下方的 ×。"
 if ! npm start; then
