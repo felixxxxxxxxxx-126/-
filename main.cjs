@@ -1,13 +1,14 @@
 const { app, BrowserWindow, ipcMain, screen, Menu } = require('electron');
 const path = require('node:path');
 const { step } = require('./motion.cjs');
+const WIDTH = 300, HEIGHT = 320;
 let win;
 const single = app.requestSingleInstanceLock();
 if (!single) app.quit();
 else {
   app.whenReady().then(() => {
     const area = screen.getPrimaryDisplay().workArea;
-    win = new BrowserWindow({ width: 380, height: 420, x: area.x + area.width - 400, y: area.y + area.height - 440,
+    win = new BrowserWindow({ width: WIDTH, height: HEIGHT, x: area.x + area.width - WIDTH - 20, y: area.y + area.height - HEIGHT - 20,
       transparent: true, frame: false, resizable: false, alwaysOnTop: true, hasShadow: false,
       webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, nodeIntegration: false, sandbox: true } });
     win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
@@ -15,7 +16,7 @@ else {
     win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
     win.webContents.on('will-navigate', event => event.preventDefault());
     Menu.setApplicationMenu(Menu.buildFromTemplate([{ label: '桌面小狗', submenu: [
-      { label: '召回小狗', click: () => { const a = screen.getPrimaryDisplay().workArea; win.setPosition(a.x + a.width - 400, a.y + a.height - 440); win.show(); } },
+      { label: '召回小狗', click: () => { const a = screen.getPrimaryDisplay().workArea; win.setPosition(a.x + a.width - WIDTH - 20, a.y + a.height - HEIGHT - 20); win.show(); } },
       { role: 'quit', label: '退出' }
     ] }]));
     let drag, following = false, sleeping = false, hovered = false;
@@ -41,8 +42,8 @@ else {
       if (!drag) return;
       const p = screen.getCursorScreenPoint();
       const a = screen.getDisplayNearestPoint(p).workArea;
-      win.setPosition(Math.round(Math.max(a.x, Math.min(a.x + a.width - 380, drag.bounds.x + p.x - drag.cursor.x))),
-        Math.round(Math.max(a.y, Math.min(a.y + a.height - 420, drag.bounds.y + p.y - drag.cursor.y))));
+      win.setPosition(Math.round(Math.max(a.x, Math.min(a.x + a.width - WIDTH, drag.bounds.x + p.x - drag.cursor.x))),
+        Math.round(Math.max(a.y, Math.min(a.y + a.height - HEIGHT, drag.bounds.y + p.y - drag.cursor.y))));
     });
     ipcMain.on('drag-end', () => { drag = null; });
     ipcMain.on('quit', () => app.quit());

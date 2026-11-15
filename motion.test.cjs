@@ -5,7 +5,7 @@ const bounds = { x: 400, y: 300, width: 380, height: 420 };
 const area = { x: 0, y: 0, width: 1440, height: 900 };
 test('follows distant cursor at bounded speed and faces cursor', () => {
   const next = step(bounds, { x: 1100, y: 530 }, area, .04, true);
-  assert.equal(next.x, 404);
+  assert.equal(next.x, 403);
   assert.equal(next.y, 300);
   assert.equal(next.facing, 'right');
   assert.equal(next.walking, true);

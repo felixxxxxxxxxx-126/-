@@ -4,21 +4,7 @@
 <body>
   <main aria-label="你的小狗">
     <output id="bubble" aria-live="polite">我来陪你啦！</output>
-    <button id="dog" aria-label="抚摸小狗，按住可拖动"><svg id="rig" viewBox="-70 -60 1475 1298" role="img" aria-label="白色长毛、黑色鼻头的小狗">
-      <defs>
-        <image id="fur" href="assets/dog.png" width="1335" height="1178"/>
-        <clipPath id="tail-clip"><path d="M830 65H1310V555L1080 580 1020 360 845 305Z"/></clipPath>
-        <clipPath id="front-clip"><path d="M300 740L560 740 540 1178H250Z"/></clipPath>
-        <clipPath id="rear-clip"><path d="M940 710L1140 710 1185 1120H930Z"/></clipPath>
-        <mask id="body-mask"><rect width="1335" height="1178" fill="white"/><path d="M830 65H1310V555L1080 580 1020 360 845 305Z M300 740L560 740 540 1178H250Z M940 710L1140 710 1185 1120H930Z" fill="black"/></mask>
-      </defs>
-      <g class="dog-facing">
-        <g class="tail"><use href="#fur" clip-path="url(#tail-clip)"/></g>
-        <g class="rear-leg"><use href="#fur" clip-path="url(#rear-clip)"/></g>
-        <use href="#fur" mask="url(#body-mask)"/>
-        <g class="front-leg"><use href="#fur" clip-path="url(#front-clip)"/></g>
-      </g>
-    </svg></button>
+    <button id="dog" aria-label="抚摸小狗，按住可拖动"><span class="sprite" role="img" aria-label="白色长毛、黑鼻头的小狗完整姿态动画"></span></button>
     <div id="effect" aria-hidden="true"></div>
     <nav aria-label="互动"><button data-action="pet">摸摸</button><button data-action="feed">喂食</button><button data-action="play">玩耍</button><button data-action="sleep">休息</button><button data-action="follow" aria-pressed="false">跟随</button><button data-action="quit" aria-label="退出小狗">×</button></nav>
     <small id="hint">划过头部摸摸 · 跟随可开关 · 按住拖动</small>
