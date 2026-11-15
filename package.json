@@ -1,0 +1,10 @@
+{
+  "name": "my-desktop-dog",
+  "version": "0.1.0",
+  "private": true,
+  "description": "属于你的写实桌面小狗",
+  "main": "main.cjs",
+  "scripts": {"start": "electron .", "pack:mac": "electron-builder --mac zip --arm64 --x64", "test": "node --test"},
+  "devDependencies": {"electron": "^39.0.0", "electron-builder": "^26.0.0"},
+  "build": {"appId": "local.desktop.dog", "productName": "桌面小狗", "files": ["main.cjs", "motion.cjs", "preload.cjs", "index.html", "renderer.js", "style.css", "assets/**/*"], "mac": {"category": "public.app-category.entertainment", "identity": null}}
+}
