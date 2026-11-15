@@ -9,6 +9,26 @@ function run(command, args) {
   if (result.error) throw result.error;
   if (result.status !== 0) throw new Error(`${command} 未完成（退出码 ${result.status}）`);
 }
+function installBundle(source, root) {
+  const relative = 'Electron.app/Contents/MacOS/Electron';
+  const framework = 'Electron.app/Contents/Frameworks/Electron Framework.framework/Electron Framework';
+  fs.accessSync(path.join(source, relative), fs.constants.X_OK);
+  fs.accessSync(path.join(source, framework), fs.constants.R_OK);
+  const stage = fs.mkdtempSync(path.join(root, '.repair-'));
+  try {
+    const prepared = path.join(stage, 'prepared');
+    // Framework bundles use relative symlinks: never rewrite them to the extraction path.
+    fs.cpSync(source, prepared, { recursive: true, verbatimSymlinks: true });
+    fs.accessSync(path.join(prepared, framework), fs.constants.R_OK);
+    const dist = path.join(root, 'dist');
+    const previous = path.join(stage, 'previous');
+    const existed = fs.existsSync(dist);
+    if (existed) fs.renameSync(dist, previous);
+    try { fs.renameSync(prepared, dist); }
+    catch (error) { if (existed) fs.renameSync(previous, dist); throw error; }
+    fs.writeFileSync(path.join(root, 'path.txt'), relative);
+  } finally { fs.rmSync(stage, { recursive: true, force: true }); }
+}
 function repair() {
   if (process.platform !== 'darwin') throw new Error('此修复工具用于 macOS。');
   const root = path.dirname(require.resolve('electron/package.json'));
@@ -28,12 +48,7 @@ function repair() {
     console.log('文件校验通过，正在解压……');
     const extracted = path.join(temp, 'extracted');
     run('/usr/bin/ditto', ['-x', '-k', zip, extracted]);
-    const relative = 'Electron.app/Contents/MacOS/Electron';
-    fs.accessSync(path.join(extracted, relative), fs.constants.X_OK);
-    const dist = path.join(root, 'dist');
-    fs.mkdirSync(dist, { recursive: true });
-    fs.cpSync(extracted, dist, { recursive: true });
-    fs.writeFileSync(path.join(root, 'path.txt'), relative);
+    installBundle(extracted, root);
     console.log('Electron 修复完成。现在可以运行 npm start，或双击「启动小狗.command」。');
   } finally {
     fs.rmSync(temp, { recursive: true, force: true });
@@ -46,4 +61,4 @@ if (require.main === module) {
     process.exitCode = 1;
   }
 }
-module.exports = { repair };
+module.exports = { repair, installBundle };
